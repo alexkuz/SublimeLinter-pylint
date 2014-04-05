@@ -10,8 +10,8 @@
 
 """This module exports the Pylint plugin class."""
 
-
-from SublimeLinter.lint import PythonLinter, util
+import os
+from SublimeLinter.lint import PythonLinter, util, persist
 
 
 class Pylint(PythonLinter):
@@ -20,7 +20,7 @@ class Pylint(PythonLinter):
 
     syntax = 'python'
     cmd = (
-        'pylint@python',
+        'pylint',
         '--msg-template=\'{line}:{column}:{msg_id}: {msg}\'',
         '--module-rgx=.*',  # don't check the module name
         '--reports=n',      # remove tables
@@ -36,7 +36,7 @@ class Pylint(PythonLinter):
     )
     multiline = True
     line_col_base = (1, 0)
-    tempfile_suffix = '.py'
+    tempfile_suffix = '-'
     error_stream = util.STREAM_STDOUT  # ignore missing config file message
     defaults = {
         '--disable=,': '',
@@ -61,3 +61,28 @@ class Pylint(PythonLinter):
                 col = None
 
         return match, line, col, error, warning, message, near
+
+    def merge_rc_settings(self, settings):
+        """
+        Merge .sublimelinterrc settings with settings.
+
+        Searches for .sublimelinterrc in, starting at the directory of the linter's view.
+        The search is limited to rc_search_limit directories. If found, the meta settings
+        and settings for this linter in the rc file are merged with settings.
+
+        """
+
+        search_limit = persist.settings.get('rc_search_limit', self.RC_SEARCH_LIMIT)
+        rc_settings = util.get_view_rc_settings(self.view, limit=search_limit)
+
+        if rc_settings:
+            meta = self.meta_settings(rc_settings)
+            rc_settings = rc_settings.get('linters', {}).get(self.name, {})
+            rc_settings.update(meta)
+            rcfile = rc_settings.get('rcfile')
+            if rcfile:
+                start_dir = os.path.dirname(self.view.file_name())
+                linterrc_path = util.find_file(start_dir, '.sublimelinterrc', limit=search_limit)
+                linterrc_dir = os.path.dirname(linterrc_path)
+                rc_settings['rcfile'] = os.path.abspath(os.path.join(linterrc_dir, rc_settings['rcfile']))
+            settings.update(rc_settings)
