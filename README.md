@@ -1,7 +1,7 @@
 SublimeLinter-pylint
 =========================
 
-[![Build Status](https://khancdn.eu/badges.php?service=https%3A%2F%2Ftravis-ci.org%2FSublimeLinter%2FSublimeLinter-pylint.png%3Fbranch%3Dmaster)](https://travis-ci.org/SublimeLinter/SublimeLinter-pylint)
+[![Build Status](https://travis-ci.org/SublimeLinter/SublimeLinter-pylint.svg?branch=master)](https://travis-ci.org/SublimeLinter/SublimeLinter-pylint)
 
 This linter plugin for [SublimeLinter][docs] provides an interface to [pylint](http://www.pylint.org/). It will be used with files that have the “python” syntax.
 
@@ -55,6 +55,8 @@ In addition to the standard SublimeLinter settings, SublimeLinter-pylint provide
 |disable| Disable the message, report, category or checker with the given comma-separated id(s)| |&#10003;|
 |enable| Enable the message, report, category or checker with the given comma-separated id(s)| |&#10003;|
 |rcfile| Absolute path to a pylint configuration file| | |
+|paths| A list of paths to be added to sys.path for pylint to find modules| | |
+|show-codes| Boolean that indicates whether you want the pylint code to be displayed in the status bar| | |
 
 ## Notes on Pylint and errors
 
