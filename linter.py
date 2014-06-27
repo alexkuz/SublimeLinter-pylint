@@ -333,7 +333,7 @@ class Pylint(PythonLinter):
             rcfile = rc_settings.get('rcfile')
             if rcfile:
                 start_dir = os.path.dirname(self.view.file_name())
-                linterrc_path = util.find_file(start_dir, '.sublimelinterrc', limit=search_limit)
+                linterrc_path = util.find_file(start_dir, '.sublimelinterrc', limit=limit)
                 linterrc_dir = os.path.dirname(linterrc_path)
                 rc_settings['rcfile'] = os.path.abspath(os.path.join(linterrc_dir, rc_settings['rcfile']))
 
