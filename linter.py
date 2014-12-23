@@ -15,6 +15,9 @@ import re
 from SublimeLinter.lint import PythonLinter, util, persist
 
 
+LINTER_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plugins')
+
+
 class Pylint(PythonLinter):
 
     """Provides an interface to pylint."""
@@ -26,6 +29,7 @@ class Pylint(PythonLinter):
         '--module-rgx=.*',  # don't check the module name
         '--reports=n',      # remove tables
         '--persistent=n',   # don't save the old score (no sense for temp)
+        '--load-plugins=flask_ext_plugin'
     )
     version_args = '--version'
     version_re = r'pylint.* (?P<version>\d+\.\d+\.\d+),'
@@ -37,10 +41,14 @@ class Pylint(PythonLinter):
     )
     multiline = True
     line_col_base = (1, 0)
+    env = {
+        'PYTHONPATH': '${PYTHONPATH}:%s' % LINTER_PATH
+    }
 
     @property
     def tempfile_suffix(self):
         """Use the real file if possible."""
+
         mode = persist.settings.get('lint_mode', 'background')
         if mode in ('load/save', 'save only') or not self.view.is_dirty():
             return '-'
@@ -258,6 +266,7 @@ class Pylint(PythonLinter):
 
     def build_args(self, settings):
         """Attach paths so pylint can find more modules."""
+
         args = super().build_args(settings)
         if settings.get('paths'):
             init_hook = '''--init-hook=import sys;{}'''.format(
@@ -275,6 +284,7 @@ class Pylint(PythonLinter):
 
         We override this to deal with the idiosyncracies of pylint's error messages.
         """
+
         match, line, col, error, warning, message, near = super().split_match(match)
 
         show_codes = self.get_merged_settings()['show-codes']
@@ -320,7 +330,6 @@ class Pylint(PythonLinter):
         and settings for this linter in the rc file are merged with settings.
 
         """
-
 
         limit = persist.settings.get('rc_search_limit', None)
         rc_settings = util.get_view_rc_settings(self.view, limit=limit)
